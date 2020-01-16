@@ -73,12 +73,14 @@ class DietSpec extends CatsSuite {
 
   implicit val arbRanges: Arbitrary[Ranges] =
     Arbitrary(
-      Gen.listOf {
-        for {
-          inout <- Gen.oneOf(true, false)
-          item <- Arbitrary.arbitrary[Item]
-        } yield (inout, item)
-      }.map(Ranges)
+      Gen
+        .listOf {
+          for {
+            inout <- Gen.oneOf(true, false)
+            item <- Arbitrary.arbitrary[Item]
+          } yield (inout, item)
+        }
+        .map(Ranges)
     )
 
   implicit val arbDiet: Arbitrary[Diet[Int]] = Arbitrary(arbRanges.arbitrary.map(_.toDiet))
@@ -116,8 +118,8 @@ class DietSpec extends CatsSuite {
   }
 
   test("diet eq") {
-    val diet = (1 to 100).filter(_ % 2 == 0).foldLeft(Diet.empty[Int])(_ add _)
-    val inverted = (1 to 100).reverse.filter(_ % 2 == 0).foldLeft(Diet.empty[Int])(_ add _)
+    val diet = (1 to 100).filter(_ % 2 == 0).foldLeft(Diet.empty[Int])(_.add(_))
+    val inverted = (1 to 100).reverse.filter(_ % 2 == 0).foldLeft(Diet.empty[Int])(_.add(_))
 
     dietEq.eqv(diet, inverted) should be(true)
   }
@@ -126,19 +128,26 @@ class DietSpec extends CatsSuite {
     val ranges = rs.rs.map(_._2)
     val reversed = rs.rs.reverse.map(_._2)
 
-    val d1 = ranges.foldLeft(Diet.empty[Int]) { (diet, r) => r.addToDiet(diet) }
-    val d2 = reversed.foldLeft(Diet.empty[Int]) { (diet, r) => r.addToDiet(diet) }
+    val d1 = ranges.foldLeft(Diet.empty[Int]) { (diet, r) =>
+      r.addToDiet(diet)
+    }
+    val d2 = reversed.foldLeft(Diet.empty[Int]) { (diet, r) =>
+      r.addToDiet(diet)
+    }
 
     dietEq.eqv(d1, d2) should be(true)
   })
 
   test("reshaping results on the same diet")(forAll { rs: Ranges =>
-
-    val d1 = rs.rs.map(_._2).foldLeft(Diet.empty[Int]) { (diet, r) => r.addToDiet(diet) }
+    val d1 = rs.rs.map(_._2).foldLeft(Diet.empty[Int]) { (diet, r) =>
+      r.addToDiet(diet)
+    }
 
     val ranges = Random.shuffle(rs.rs)
 
-    val d2 = ranges.map(_._2).foldLeft(Diet.empty[Int]) { (diet, r) => r.addToDiet(diet) }
+    val d2 = ranges.map(_._2).foldLeft(Diet.empty[Int]) { (diet, r) =>
+      r.addToDiet(diet)
+    }
 
     dietEq.eqv(d1, d2) should be(true)
   })
@@ -190,7 +199,9 @@ class DietSpec extends CatsSuite {
   })
 
   test("foldRight")(forAll { (rs: Ranges, start: Int, f: (Int, Int) => Int) =>
-    rs.toDiet.foldRight(Eval.now(start))((v, acc) => acc.map(f(v, _))).value should be(rs.toSet.toList.sorted.foldRight(start)(f))
+    rs.toDiet.foldRight(Eval.now(start))((v, acc) => acc.map(f(v, _))).value should be(
+      rs.toSet.toList.sorted.foldRight(start)(f)
+    )
   })
 
   test("foldRight/toList")(forAll { (rs: Ranges) =>
@@ -212,7 +223,7 @@ class DietSpec extends CatsSuite {
   })
 
   test("intersection diet")(forAll { (rs1: Ranges, rs2: Ranges) =>
-    (rs1.toDiet & rs2.toDiet).toList should be((rs1.toSet intersect rs2.toSet).toList.sorted)
+    (rs1.toDiet & rs2.toDiet).toList should be(rs1.toSet.intersect(rs2.toSet).toList.sorted)
   })
 
   test("join disjoint range") {
@@ -226,9 +237,7 @@ class DietSpec extends CatsSuite {
   test("contains")(forAll { (rs: Ranges) =>
     val diet = rs.toDiet
     val set = rs.toSet
-    set.foreach(elem =>
-      assert(diet.contains(elem))
-    )
+    set.foreach(elem => assert(diet.contains(elem)))
   })
 
   test("not contains")(forAll { (rs: Ranges, elem: Int) =>

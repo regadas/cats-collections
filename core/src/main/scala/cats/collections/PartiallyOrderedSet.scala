@@ -1,6 +1,6 @@
 package cats.collections
 
-import cats.{UnorderedFoldable, Order}
+import cats.{Order, UnorderedFoldable}
 import scala.annotation.tailrec
 
 /**
@@ -58,7 +58,7 @@ trait PartiallyOrderedSet[F[_]] extends UnorderedFoldable[F] {
   def sortedFoldLeft[A, B](fa: F[A], init: B)(fn: (B, A) => B)(implicit order: Order[A]): B = {
     @tailrec def loop(fa: F[A], init: B): B =
       minimumOption(fa) match {
-        case None => init
+        case None      => init
         case Some(min) => loop(removeMin(fa), fn(init, min))
       }
 
@@ -96,7 +96,9 @@ trait PartiallyOrderedSet[F[_]] extends UnorderedFoldable[F] {
    * return a sorted list of all items in fa
    */
   def toSortedList[A](fa: F[A])(implicit order: Order[A]): List[A] =
-    sortedFoldLeft(fa, List.empty[A]) { (tail, a) => a :: tail }.reverse
+    sortedFoldLeft(fa, List.empty[A]) { (tail, a) =>
+      a :: tail
+    }.reverse
 
   /**
    * same as items.foldLeft(fa)(addIfLarger(_, count, _))
@@ -109,13 +111,17 @@ trait PartiallyOrderedSet[F[_]] extends UnorderedFoldable[F] {
    */
   @deprecated("Use pop instead", "2019-07-10")
   def unadd[A](fa: F[A])(implicit order: Order[A]): Option[(A, F[A])] =
-    minimumOption(fa).map { min => (min, removeMin(fa)) }
+    minimumOption(fa).map { min =>
+      (min, removeMin(fa))
+    }
 
   /**
    * Same as get the minimimumOption and removinging the minimum
    */
   def pop[A](fa: F[A])(implicit order: Order[A]): Option[(A, F[A])] =
-    minimumOption(fa).map { min => (min, removeMin(fa)) }
+    minimumOption(fa).map { min =>
+      (min, removeMin(fa))
+    }
 
   /**
    * Given an Order[A] we can always make an Order[F[A]]
@@ -127,14 +133,14 @@ trait PartiallyOrderedSet[F[_]] extends UnorderedFoldable[F] {
       @tailrec
       final def compare(left: F[A], right: F[A]): Int =
         (minimumOption(left), minimumOption(right)) match {
-          case (None, None) => 0
+          case (None, None)    => 0
           case (None, Some(_)) => -1
           case (Some(_), None) => 1
           case (Some(l), Some(r)) =>
             val c = ordA.compare(l, r)
             if (c != 0) c
             else compare(removeMin(left), removeMin(right))
-      }
+        }
     }
 }
 

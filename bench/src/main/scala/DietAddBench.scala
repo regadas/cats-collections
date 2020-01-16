@@ -1,13 +1,12 @@
 /**
-  * Created by anicolaspp on 2/18/16.
-  */
-
+ * Created by anicolaspp on 2/18/16.
+ */
 package cats.collections
 package bench
 
 import org.openjdk.jmh.annotations.{Benchmark, Param, Scope, Setup, State}
 import scala.util.Random
-import scalaz.{IList, Diev}
+import scalaz.{Diev, IList}
 import cats._
 import cats.implicits._
 
@@ -22,17 +21,13 @@ class BestCaseRangesList {
   var scalazValues: IndexedSeq[Int] = _
   var dogValues: IndexedSeq[Int] = _
 
-  def getBestCaseDataScalaz: scala.IndexedSeq[scala.Range] = {
+  def getBestCaseDataScalaz: scala.IndexedSeq[scala.Range] =
     for (x <- scala.Range(1, n)
-         if (x % 10 == 0)
-    ) yield scala.Range(x, x + 10)
-  }
+         if x % 10 == 0) yield scala.Range(x, x + 10)
 
-  def getBestCaseDataDogs: scala.IndexedSeq[Range[Int]] = {
+  def getBestCaseDataDogs: scala.IndexedSeq[Range[Int]] =
     for (x <- scala.Range(1, n)
-         if (x % 10 == 0)
-    ) yield Range(x, x + 10)
-  }
+         if x % 10 == 0) yield Range(x, x + 10)
 
   @Setup
   def setup: Unit = {
@@ -53,21 +48,20 @@ class DietAddBench extends BestCaseRangesList {
   def dogsDietAdd: Unit = {
     var diet = Diet.empty[Int]
 
-    dogValues.foreach{ i => diet = diet + i }
+    dogValues.foreach { i =>
+      diet = diet + i
+    }
   }
 
   @Benchmark
-  def scalazDievAdd: Unit = {
+  def scalazDievAdd: Unit =
     scalazValues.foldLeft(Diev.empty[Int])((d, r) => d + r)
-  }
 
   @Benchmark
-  def dogsDietAddRange: Unit = {
+  def dogsDietAddRange: Unit =
     dogRanges.foldLeft(Diet.empty[Int])((d, r) => d + Range(r.start, r.end))
-  }
 
   @Benchmark
-  def scalazDievAddRange: Unit = {
+  def scalazDievAddRange: Unit =
     scalazRanges.foldLeft(Diev.empty[Int])((d, r) => d + (r.start, r.end))
-  }
 }

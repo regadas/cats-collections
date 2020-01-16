@@ -1,7 +1,6 @@
 /**
  * Created by anicolaspp on 2/18/16.
  */
-
 package cats.collections
 package bench
 
@@ -35,12 +34,10 @@ class DietBenchSearch {
   }
 
   @Benchmark
-  def dogsDietSearch: Unit = {
+  def dogsDietSearch: Unit =
     scala.Range(0, 1000).foreach(i => diet.contains(i))
-  }
 
   @Benchmark
-  def scalazDievSearch: Unit = {
+  def scalazDievSearch: Unit =
     scala.Range(0, 1000).foreach(i => diev.contains(i))
-  }
 }

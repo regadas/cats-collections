@@ -31,7 +31,7 @@ class TreeListBench {
     @tailrec
     def loop(ls: List[Int], acc: Int): Int =
       ls match {
-        case Nil => acc
+        case Nil       => acc
         case h :: tail => loop(tail, acc + h)
       }
 
@@ -55,7 +55,7 @@ class TreeListBench {
     @tailrec
     def loop(ls: TreeList[Int], acc: Int): Int =
       ls.uncons match {
-        case None => acc
+        case None            => acc
         case Some((h, tail)) => loop(tail, acc + h)
       }
 

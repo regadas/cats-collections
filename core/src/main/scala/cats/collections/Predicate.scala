@@ -8,6 +8,7 @@ import cats._
  * which is a test for membership.
  */
 abstract class Predicate[-A] extends scala.Function1[A, Boolean] { self =>
+
   /**
    * returns a predicate which is the union of this predicate and another
    */
@@ -65,11 +66,11 @@ object Predicate extends PredicateInstances {
 trait PredicateInstances {
   implicit def predicateMonoid[A]: Monoid[Predicate[A]] = new Monoid[Predicate[A]] {
     override def empty: Predicate[A] = Predicate.empty
-    override def combine(l: Predicate[A], r: Predicate[A]): Predicate[A] = l union r
+    override def combine(l: Predicate[A], r: Predicate[A]): Predicate[A] = l.union(r)
   }
 
   implicit val predicateInstance: MonoidK[Predicate] = new MonoidK[Predicate] {
     override def empty[A]: Predicate[A] = Predicate.empty
-    override def combineK[A](l: Predicate[A], r: Predicate[A]): Predicate[A] = l union r
+    override def combineK[A](l: Predicate[A], r: Predicate[A]): Predicate[A] = l.union(r)
   }
 }

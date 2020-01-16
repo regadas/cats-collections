@@ -31,7 +31,8 @@ micrositePalette := Map(
   "gray" -> "#7B7B7E",
   "gray-light" -> "#E5E5E6",
   "gray-lighter" -> "#F4F3F4",
-  "white-color" -> "#FFFFFF")
+  "white-color" -> "#FFFFFF"
+)
 
 includeFilter in Jekyll := (includeFilter in makeSite).value
 
@@ -42,7 +43,8 @@ git.remoteRepo := "git@github.com:typelevel/cats-collections.git"
 scalacOptions := Seq(
   "-feature",
   "-deprecation",
-  "-encoding", "utf8",
+  "-encoding",
+  "utf8",
   "-language:postfixOps",
   "-language:higherKinds",
   "-language:implicitConversions",
@@ -53,4 +55,5 @@ scalacOptions := Seq(
   "-Ywarn-dead-code",
   "-Ywarn-value-discard",
   "-Xfuture",
-  "-nowarn")
+  "-nowarn"
+)

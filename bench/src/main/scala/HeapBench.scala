@@ -55,7 +55,7 @@ class HeapBench {
   @Benchmark
   def removeAllHeap(bh: Blackhole): Unit = {
     var h = heap
-    while(h.nonEmpty) {
+    while (h.nonEmpty) {
       h = h.remove
     }
     bh.consume(h)
@@ -64,20 +64,18 @@ class HeapBench {
   @Benchmark
   def removeAllPairingHeap(bh: Blackhole): Unit = {
     var h = pheap
-    while(h.nonEmpty) {
+    while (h.nonEmpty) {
       h = h.remove
     }
     bh.consume(h)
   }
 
   @Benchmark
-  def takeLargestHeap(bh: Blackhole): Unit = {
-    bh.consume(Heap.takeLargest(data, n/10).toList)
-  }
+  def takeLargestHeap(bh: Blackhole): Unit =
+    bh.consume(Heap.takeLargest(data, n / 10).toList)
 
   @Benchmark
-  def takeLargestPairingHeap(bh: Blackhole): Unit = {
-    bh.consume(PairingHeap.takeLargest(data, n/10).toList)
-  }
+  def takeLargestPairingHeap(bh: Blackhole): Unit =
+    bh.consume(PairingHeap.takeLargest(data, n / 10).toList)
 
 }

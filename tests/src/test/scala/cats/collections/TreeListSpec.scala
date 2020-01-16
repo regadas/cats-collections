@@ -1,7 +1,7 @@
 package cats.collections
 package tests
 
-import cats.{Eq, Order, PartialOrder, Monoid, Traverse}
+import cats.{Eq, Monoid, Order, PartialOrder, Traverse}
 import cats.laws.discipline._
 import cats.tests.CatsSuite
 import org.scalacheck.{Arbitrary, Cogen, Gen}
@@ -11,30 +11,20 @@ import cats.collections.arbitrary.ArbitraryTreeList._
 class TreeListSpec extends CatsSuite {
 
   implicit def arbPartialFn[A: Cogen, B: Arbitrary]: Arbitrary[PartialFunction[A, B]] =
-    Arbitrary(
-      Gen.zip(
-        Gen.choose(0, 32),
-        Gen.choose(Int.MinValue, Int.MaxValue),
-        Arbitrary.arbitrary[A => B]).map { case (shift, xor, fn) =>
-
-      { case a if (a.hashCode ^ xor) >>> shift == 0 => fn(a) }
+    Arbitrary(Gen.zip(Gen.choose(0, 32), Gen.choose(Int.MinValue, Int.MaxValue), Arbitrary.arbitrary[A => B]).map {
+      case (shift, xor, fn) => { case a if (a.hashCode ^ xor) >>> shift == 0 => fn(a) }
 
     })
 
-  checkAll("Traverse[TreeList]",
-    TraverseTests[TreeList].traverse[Long, Int, String, Int, Option, Option])
+  checkAll("Traverse[TreeList]", TraverseTests[TreeList].traverse[Long, Int, String, Int, Option, Option])
 
-  checkAll("Alternative[TreeList]",
-    AlternativeTests[TreeList].alternative[Long, Int, String])
+  checkAll("Alternative[TreeList]", AlternativeTests[TreeList].alternative[Long, Int, String])
 
-  checkAll("FunctorFilter[TreeList]",
-    FunctorFilterTests[TreeList].functorFilter[Long, Int, String])
+  checkAll("FunctorFilter[TreeList]", FunctorFilterTests[TreeList].functorFilter[Long, Int, String])
 
-  checkAll("Monad[TreeList]",
-    MonadTests[TreeList].monad[Long, Int, String])
+  checkAll("Monad[TreeList]", MonadTests[TreeList].monad[Long, Int, String])
 
-  checkAll("CoflatMap[TreeList]",
-    CoflatMapTests[TreeList].coflatMap[Long, Int, String])
+  checkAll("CoflatMap[TreeList]", CoflatMapTests[TreeList].coflatMap[Long, Int, String])
 
   checkAll("Traverse[TreeList]", SerializableTests.serializable(Traverse[TreeList]))
 
@@ -48,7 +38,9 @@ class TreeListSpec extends CatsSuite {
   }
 
   test("++ works")(forAll { (xs: TreeList[Int], ys: TreeList[Int]) =>
-    testHomomorphism(xs)({ l => (l ++ ys).toList }, { _ ++ (ys.toList) })
+    testHomomorphism(xs)({ l =>
+      (l ++ ys).toList
+    }, { _ ++ (ys.toList) })
   })
 
   test("drop/take work")(forAll { (xs: TreeList[Int], n: Int) =>
@@ -119,7 +111,7 @@ class TreeListSpec extends CatsSuite {
     val maxD = xs.maxDepth
     if (xs.isEmpty) assert(maxD == 0)
     else {
-      val upper = 2.0 * math.log(xs.size.toDouble)/math.log(2.0) + 1.0
+      val upper = 2.0 * math.log(xs.size.toDouble) / math.log(2.0) + 1.0
       assert(maxD.toDouble <= upper)
     }
   })
@@ -155,7 +147,10 @@ class TreeListSpec extends CatsSuite {
   }
 
   test("PartialOrder[TreeList[A]] works")(forAll { (xs: TreeList[Opaque2], ys: TreeList[Opaque2]) =>
-    assert(PartialOrder[TreeList[Opaque2]].partialCompare(xs, ys) == PartialOrder[List[Opaque2]].partialCompare(xs.toList, ys.toList))
+    assert(
+      PartialOrder[TreeList[Opaque2]].partialCompare(xs, ys) == PartialOrder[List[Opaque2]].partialCompare(xs.toList,
+                                                                                                           ys.toList)
+    )
     assert(PartialOrder[TreeList[Opaque2]].partialCompare(xs, xs) == 0.0)
   })
 
@@ -229,7 +224,7 @@ class TreeListSpec extends CatsSuite {
     assert(xs.sequence.void == xs.sequence_)
   })
 
-  test("Show matches toString")(forAll{ (xs: TreeList[Int]) =>
+  test("Show matches toString")(forAll { (xs: TreeList[Int]) =>
     assert(xs.show == xs.toString)
   })
 
@@ -249,8 +244,7 @@ class TreeListSpec extends CatsSuite {
         val ls1 = ls.updated(idx.toInt, v)
         assert(xs1.toIterator.toVector == ls1)
         assert(xs.updated(idx, v) == Some(xs1))
-      }
-      else {
+      } else {
         assert(xs eq xs1)
         assert(xs.updated(idx, v) == None)
       }
@@ -264,7 +258,9 @@ class TreeListSpec extends CatsSuite {
 
   test("we don't stack overflow on large sequences") {
     val size = 100000
-    def buildFn(i: Int): Int => Int = { j: Int => i + j }
+    def buildFn(i: Int): Int => Int = { j: Int =>
+      i + j
+    }
     val bigList = (0 until size).iterator.map(buildFn).toList
     // This does not work because the stack is as deep as the size of the list
     assertThrows[Throwable] {
@@ -278,7 +274,11 @@ class TreeListSpec extends CatsSuite {
   }
 
   test("filter/filterNot consistency")(forAll { (xs: TreeList[Int], fn: Int => Boolean) =>
-    testHomomorphism(xs)({ l => l.filter(fn).toList }, { _.toList.filter(fn) })
-    assert(xs.filterNot(fn) == xs.filter { a => !fn(a) })
+    testHomomorphism(xs)({ l =>
+      l.filter(fn).toList
+    }, { _.toList.filter(fn) })
+    assert(xs.filterNot(fn) == xs.filter { a =>
+      !fn(a)
+    })
   })
 }
